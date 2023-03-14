@@ -1,0 +1,17 @@
+#!/bin/bash
+
+ignore=("main" "production")
+targets=()
+eval "$(git for-each-ref --shell --format='targets+=(%(refname))' refs/heads/)"
+
+for target in "${targets[@]}"; do
+    for i in "${ignore[@]}"; do
+        if [[ "$target" == "refs/heads/$i" ]]; then
+            echo "Ignoring $target"
+            continue 2
+        fi
+    done
+
+    echo "Deleting ${target:11} branch"
+    git branch -D "${target:11}"
+done
